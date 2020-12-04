@@ -69,23 +69,29 @@ Room* createRoom(char*, int, Monster*, Item*);
 void printRoom(Room*);
 void setRoomInDirection(Room*, Room*, int);
 Room* getRoomInDirection(Room*, int);
-int createMap(char*, int*);
+int createMap(char*, int*, Room**);
 
+void printDungeon(Room*, int, int*);
 
 int main(void)
 {
     srand((unsigned int) time(NULL));
     
     int nrOfItems = readTreasureFile("items.txt");
-    for (int i = 0; i < nrOfItems; i++)
-    {
-        printItem(treasures[i]);
-    }
+    // for (int i = 0; i < nrOfItems; i++)
+    //     printItem(treasures[i]);
 
-    int nrOfRooms = createMap("rooms.txt", &nrOfItems);
-    for (int i = 0; i < nrOfRooms; i++)
-        printRoom(rooms[i]);
+    Room *startRoom = (Room*) malloc(sizeof(Room));
+    int rekDepth = 0;
+    int nrOfRooms = createMap("rooms.txt", &nrOfItems, &startRoom);
+    // for (int i = 0; i < nrOfRooms; i++)
+    //     printRoom(rooms[i]);
 
+
+    
+
+    printDungeon(startRoom, -1, &rekDepth);
+    printf("%d\n", rekDepth);
     return 0;
 }
 
@@ -390,7 +396,7 @@ Room* getRoomInDirection(Room *room, int direction)
     }
 }
 
-int createMap(char* filename, int *n)
+int createMap(char* filename, int *n, Room **startRoom)
 {
     FILE *fin;
     fin = fopen(filename, "r");
@@ -460,10 +466,22 @@ int createMap(char* filename, int *n)
         
         // Startraum zurückgeben, weil Eingang nicht immer rooms[0] ist
         fclose(fin);
+        *startRoom = rooms[0];
         return count;
+    }
+}
 
-    } 
+void printDungeon(Room *room, int direction, int *rekDepth)
+{
+    printRoom(room);
 
+    for (int i = north; i <= west; i++)
+    {
+        if (i != direction && getRoomInDirection(room, i) != NULL)
+        {
+            printDungeon(getRoomInDirection(room, i), (i + 2) % 4, rekDepth + 1);
+        }
+    }
 }
 
 
