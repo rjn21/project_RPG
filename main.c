@@ -86,34 +86,6 @@ int main(void)
     for (int i = 0; i < nrOfRooms; i++)
         printRoom(rooms[i]);
 
-    // Item* sword = createItem("Holzschwert", rightHand, 2.5, 30, 0);
-	// Item* ironSword = createItem("Eisenschwert", rightHand, 5, 55, 0);
-	// Item* healPotion = createItem("Heiltrank", leftHand, 0.5, 10, 5);
-
-    // Hero *zelda = createHero("Zelda", 10);
-    // wearItem(zelda, sword);
-    // wearItem(zelda, ironSword);
-    // addToInventory(zelda, healPotion);
-
-    // Monster* zombie = createMonster("Zombie", 3, 4, 6);
-	// Monster* mage = createMonster("Magier", 5, 2, 8);
-    // monsterAddLoot(mage, healPotion);
-
-    // Room *entrance = createRoom("Eingang", 0, zombie, healPotion);
-	// Room *throneRoom = createRoom("Thronsaal", 0, mage, &NOTHING);
-
-    // setRoomInDirection(entrance, throneRoom, west);
-
-    // setRoom(zelda, entrance);
-    // // printHero(zelda);
-    // walkInDirection(zelda, west);
-
-	// printHero(zelda);
-	// printMonster(zombie);
-	// printMonster(mage);
-	// printRoom(entrance);
-	// printRoom(throneRoom);
-
     return 0;
 }
 
