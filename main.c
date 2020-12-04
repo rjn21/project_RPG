@@ -78,18 +78,12 @@ int main(void)
     srand((unsigned int) time(NULL));
     
     int nrOfItems = readTreasureFile("items.txt");
-    // for (int i = 0; i < nrOfItems; i++)
-    //     printItem(treasures[i]);
 
     Room *startRoom = (Room*) malloc(sizeof(Room));
+
     int rekDepth = 0;
     int nrOfRooms = createMap("rooms.txt", &nrOfItems, &startRoom);
-    // for (int i = 0; i < nrOfRooms; i++)
-    //     printRoom(rooms[i]);
-
-
-    
-
+ 
     printDungeon(startRoom, -1, &rekDepth);
     printf("%d\n", rekDepth);
     return 0;
@@ -395,6 +389,14 @@ Room* getRoomInDirection(Room *room, int direction)
         return NULL;
     }
 }
+
+/*
+ *****************
+ * createDungeon *
+ *****************
+ * creates a Dungeon from a "rooms.txt"
+ * returns the number of rooms in the Dungeon ans sets the "Entrance" as startRoom
+ */
 
 int createMap(char* filename, int *n, Room **startRoom)
 {
