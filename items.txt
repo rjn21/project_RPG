@@ -1,0 +1,30 @@
+10
+Armbrust
+3,3.5,25,0
+
+Heilamulett
+1,0.25,100,2
+
+Eisenhelm
+0,1.5,35,0
+
+Verfluchte Stiefel
+5,0.5,20,-1
+
+Platinrüstung
+2,5.0,125,0
+
+Barbarenaxt
+3,3.0,55,0
+
+Heilring
+4,0.5,125,1
+
+Heiltrank
+4,0.25,25,2
+
+Chaosschwert
+3,3.0,200,1
+
+Alte Stiefel
+5,0.75,0,0
