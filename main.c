@@ -483,6 +483,3 @@ void printDungeon(Room *room, int direction, int *rekDepth)
         }
     }
 }
-
-
-
