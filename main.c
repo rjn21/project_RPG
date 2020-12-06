@@ -96,12 +96,7 @@ int main(void)
     printf("nrOfRoomsRek: %d\n", nrOfRoomsRek);
 
     printf("\n");
-    printf("Test");
 
-
-    // free(startRoom);
-    // free(rooms);
-    // free(treasures);
     return 0;
 }
 
@@ -516,28 +511,29 @@ int* getZeroIntArray(int *size)
 
 int countRoomsRek(Room* room, int* wasIn)
 {
-    Room* roomInDiretion = NULL;
+    Room *roomInDirection = (Room*) malloc(sizeof(Room*));
     int sum = 0;
 
     
     for (int i = north; i <= west; i++)
     {
         // raum in Richtung i speicher --> uebersichtlicher
-        roomInDiretion = getRoomInDirection(room, i);
+        roomInDirection = getRoomInDirection(room, i);
 
         // wenn in Richtung i ein Raum ist ...
-        if (roomInDiretion != NULL)
+        if (roomInDirection != NULL)
         {
             // und man noch nicht in diesem Raum war
-            if (wasIn[roomInDiretion->id - 1] != 1)
+            if (wasIn[roomInDirection->id - 1] != 1)
             {
                 // dann markieren, dass er in diesem Raum war ..
-                wasIn[roomInDiretion->id - 1] = 1;
+                wasIn[roomInDirection->id - 1] = 1;
                 // zaehle alle Raeume, die an diese Raum angrenzen und in denen man noch nicht war
-                sum += countRoomsRek(roomInDiretion, wasIn);
+                sum += countRoomsRek(roomInDirection, wasIn);
             }            
         }
     }
+    // free(roomInDirection);
     return (1 + sum);
 }
 
@@ -546,5 +542,5 @@ int countRooms(Room* startRoom, int *nrOfRooms)
     // erstelle int-Array mit nrOfRooms Stellen; alle Stellen = 0 
     int *wasIn = getZeroIntArray(nrOfRooms);
     // Rueckgabe der Anzahl der Raeume
-    return countRoomsRek(startRoom, nrOfRooms);
+    return countRoomsRek(startRoom, wasIn);
 }
