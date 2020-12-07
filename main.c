@@ -73,12 +73,16 @@ Room* getRoomInDirection(Room*, int);
 int createMap(char*, int*, Room**);
 
 void printDungeon(Room*, int, int*);
-
 int* getZeroIntArray(int*);
-
 int countRoomsRek(Room*, int*);
+int countRoomsWithArray(Room*, int*);
+int countRooms(Room*, int);
 
-int countRooms(Room*, int*);
+
+
+
+
+
 
 
 int main(void)
@@ -90,13 +94,16 @@ int main(void)
     Room *startRoom = (Room*) malloc(sizeof(Room));
 
     int nrOfRooms = createMap("rooms.txt", &nrOfItems, &startRoom);
+    
+    printDungeon(startRoom, -1, NULL);
 
-    int nrOfRoomsRek = countRooms(startRoom, &nrOfRooms);
+    int nrOfRoomsRek = countRooms(startRoom, -1);
+    printf("countRooms: %d\n", nrOfRoomsRek);
 
-    printf("nrOfRoomsRek: %d\n", nrOfRoomsRek);
+    nrOfRoomsRek = countRoomsWithArray(startRoom, &nrOfRooms);
+    printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
 
     printf("\n");
-
     return 0;
 }
 
@@ -489,6 +496,7 @@ int createMap(char* filename, int *n, Room **startRoom)
 void printDungeon(Room *room, int direction, int *rekDepth)
 {
     printRoom(room);
+    // printf("ID: %d\n", room->id);
 
     for (int i = north; i <= west; i++)
     {
@@ -498,8 +506,6 @@ void printDungeon(Room *room, int direction, int *rekDepth)
         }
     }
 }
-
-
 
 int* getZeroIntArray(int *size)
 {
@@ -513,6 +519,7 @@ int countRoomsRek(Room* room, int* wasIn)
 {
     Room *roomInDirection = (Room*) malloc(sizeof(Room*));
     int sum = 0;
+    wasIn[room->id - 1] = 1;
 
     
     for (int i = north; i <= west; i++)
@@ -537,10 +544,25 @@ int countRoomsRek(Room* room, int* wasIn)
     return (1 + sum);
 }
 
-int countRooms(Room* startRoom, int *nrOfRooms)
+int countRoomsWithArray(Room* startRoom, int *nrOfRooms)
 {
     // erstelle int-Array mit nrOfRooms Stellen; alle Stellen = 0 
     int *wasIn = getZeroIntArray(nrOfRooms);
     // Rueckgabe der Anzahl der Raeume
     return countRoomsRek(startRoom, wasIn);
+}
+
+int countRooms(Room *room, int direction)
+{
+    int sum = 0;
+
+    for (int i = north; i <= west; i++)
+    {
+        if (i != direction && getRoomInDirection(room, i) != NULL)
+        {
+            sum += countRooms(getRoomInDirection(room, i), (i + 2) % 4);
+        }
+    }
+
+    return (1 + sum);
 }
