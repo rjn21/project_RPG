@@ -11,7 +11,7 @@ Eisenhelm
 Verfluchte Stiefel
 5,0.5,20,-1
 
-Platinrüstung
+Platinruestung
 2,5.0,125,0
 
 Barbarenaxt

@@ -25,7 +25,8 @@ typedef struct Monster
 } Monster;
 
 typedef struct Room
-{
+{   
+    int id;
     char        name[26];
     struct Room *nextroom[4];
     int         lpImpact;
@@ -44,7 +45,7 @@ typedef struct Hero
 } Hero;
 
 Item NOTHING = {"Leer", head, 0.0, 0};
-Room WALL = {"Wand", NULL, 0, NULL, NULL}; 
+Room WALL = {0, "Wand", NULL, 0, NULL, NULL}; 
 Item **treasures;
 Room **rooms;
 
@@ -65,11 +66,23 @@ Monster* createMonster(char*, int, int, int);
 void printMonster(Monster*);
 void monsterAddLoot(Monster*, Item*);
 
-Room* createRoom(char*, int, Monster*, Item*);
+Room* createRoom(int, char*, int, Monster*, Item*);
 void printRoom(Room*);
 void setRoomInDirection(Room*, Room*, int);
 Room* getRoomInDirection(Room*, int);
-int createMap(char*, int*);
+int createMap(char*, int*, Room**);
+
+void printDungeon(Room*, int, int*);
+int* getZeroIntArray(int*);
+int countRoomsRek(Room*, int*);
+int countRoomsWithArray(Room*, int*);
+int countRooms(Room*, int);
+
+
+
+
+
+
 
 
 int main(void)
@@ -77,15 +90,24 @@ int main(void)
     srand((unsigned int) time(NULL));
     
     int nrOfItems = readTreasureFile("items.txt");
-    for (int i = 0; i < nrOfItems; i++)
-    {
-        printItem(treasures[i]);
-    }
 
-    int nrOfRooms = createMap("rooms.txt", &nrOfItems);
-    for (int i = 0; i < nrOfRooms; i++)
-        printRoom(rooms[i]);
+    Room *startRoom = (Room*) malloc(sizeof(Room));
 
+    int nrOfRooms = createMap("rooms.txt", &nrOfItems, &startRoom);
+    
+    printDungeon(startRoom, -1, NULL);
+
+    int nrOfRoomsRek = countRooms(startRoom, -1);
+    printf("countRooms: %d\n", nrOfRoomsRek);
+
+    nrOfRoomsRek = countRoomsWithArray(startRoom, &nrOfRooms);
+    printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
+
+    printf("\n");
+    
+    // only for Windows
+    // system("pause");
+    
     return 0;
 }
 
@@ -145,7 +167,7 @@ int readTreasureFile(char *filename)
         char buffer[256];
         fscanf(fin, "%d\n", &count);
 
-        treasures = (Item*) malloc(count * sizeof(Item*));
+        treasures = (Item**) malloc(count * sizeof(Item*));
 
         for (int i = 0; i < count; i++)
         {
@@ -328,9 +350,11 @@ void monsterAddLoot(Monster *monster, Item *item)
  * ---------------
  */
 
-Room* createRoom(char* name, int lpImp, Monster *monster, Item *item)
+Room* createRoom(int id, char* name, int lpImp, Monster *monster, Item *item)
 {
     Room *newRoom = (Room*) malloc(sizeof(Room));
+
+    newRoom->id = id;
     strcpy(newRoom->name, name);
     
     for (int i = 0; i < 4; i++)
@@ -390,7 +414,15 @@ Room* getRoomInDirection(Room *room, int direction)
     }
 }
 
-int createMap(char* filename, int *n)
+/*
+ *****************
+ * createDungeon *
+ *****************
+ * creates a Dungeon from a "rooms.txt"
+ * returns the number of rooms in the Dungeon ans sets the "Entrance" as startRoom
+ */
+
+int createMap(char* filename, int *n, Room **startRoom)
 {
     FILE *fin;
     fin = fopen(filename, "r");
@@ -406,7 +438,7 @@ int createMap(char* filename, int *n)
         fscanf(fin, "%d\n", &count);
 
         // Speicher für "count" Raeume allokieren
-        rooms = (Room*) malloc(count * sizeof(Room*));
+        rooms = (Room**) malloc(count * sizeof(Room*));
 
         char buffer[256];
         char name[256];
@@ -437,7 +469,7 @@ int createMap(char* filename, int *n)
             strcpy(name, buffer);
             // string nach dem Komma als int in lpchange speichern 
             sscanf(buffer + j, "%d\n", &lpchange);
-            rooms[i] = createRoom(name, lpchange, NULL, treasures[rand() % (*n)]);
+            rooms[i] = createRoom(id, name, lpchange, NULL, treasures[rand() % (*n)]);
         }
         fgets(buffer, 256, fin);
         int currentRoom;
@@ -460,11 +492,80 @@ int createMap(char* filename, int *n)
         
         // Startraum zurückgeben, weil Eingang nicht immer rooms[0] ist
         fclose(fin);
+        *startRoom = rooms[0];
         return count;
-
-    } 
-
+    }
 }
 
+void printDungeon(Room *room, int direction, int *rekDepth)
+{
+    printRoom(room);
 
+    for (int i = north; i <= west; i++)
+    {
+        if (i != direction && getRoomInDirection(room, i) != NULL)
+        {
+            printDungeon(getRoomInDirection(room, i), (i + 2) % 4, rekDepth + 1);
+        }
+    }
+}
 
+int* getZeroIntArray(int *size)
+{
+    int *newArray = (int*) malloc((*size) * sizeof(int));
+    for (int i = 0; i < *size; i++)
+        newArray[i] = 0;
+    return newArray;
+}
+
+int countRoomsRek(Room* room, int* wasIn)
+{
+    Room *roomInDirection = (Room*) malloc(sizeof(Room*));
+    int sum = 0;
+    wasIn[room->id - 1] = 1;
+
+    
+    for (int i = north; i <= west; i++)
+    {
+        // raum in Richtung i speicher --> uebersichtlicher
+        roomInDirection = getRoomInDirection(room, i);
+
+        // wenn in Richtung i ein Raum ist ...
+        if (roomInDirection != NULL)
+        {
+            // und man noch nicht in diesem Raum war
+            if (wasIn[roomInDirection->id - 1] != 1)
+            {
+                // dann markieren, dass er in diesem Raum war ..
+                wasIn[roomInDirection->id - 1] = 1;
+                // zaehle alle Raeume, die an diese Raum angrenzen und in denen man noch nicht war
+                sum += countRoomsRek(roomInDirection, wasIn);
+            }            
+        }
+    }
+    // free(roomInDirection);
+    return (1 + sum);
+}
+
+int countRoomsWithArray(Room* startRoom, int *nrOfRooms)
+{
+    // erstelle int-Array mit nrOfRooms Stellen; alle Stellen = 0 
+    int *wasIn = getZeroIntArray(nrOfRooms);
+    // Rueckgabe der Anzahl der Raeume
+    return countRoomsRek(startRoom, wasIn);
+}
+
+int countRooms(Room *room, int direction)
+{
+    int sum = 0;
+
+    for (int i = north; i <= west; i++)
+    {
+        if (i != direction && getRoomInDirection(room, i) != NULL)
+        {
+            sum += countRooms(getRoomInDirection(room, i), (i + 2) % 4);
+        }
+    }
+
+    return (1 + sum);
+}
