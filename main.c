@@ -78,35 +78,42 @@ int countRoomsRek(Room*, int*);
 int countRoomsWithArray(Room*, int*);
 int countRooms(Room*, int);
 
-
-
-
-
-
-
+Room* findRoom(char*, Room*, int);
 
 int main(void)
 {
     srand((unsigned int) time(NULL));
-    
     int nrOfItems = readTreasureFile("items.txt");
-
     Room *startRoom = (Room*) malloc(sizeof(Room));
-
     int nrOfRooms = createMap("rooms.txt", &nrOfItems, &startRoom);
     
-    printDungeon(startRoom, -1, NULL);
+    // printDungeon(startRoom, -1, NULL);
 
-    int nrOfRoomsRek = countRooms(startRoom, -1);
-    printf("countRooms: %d\n", nrOfRoomsRek);
+    // int nrOfRoomsRek = countRooms(startRoom, -1);
+    // printf("countRooms: %d\n", nrOfRoomsRek);
 
-    nrOfRoomsRek = countRoomsWithArray(startRoom, &nrOfRooms);
-    printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
+    // nrOfRoomsRek = countRoomsWithArray(startRoom, &nrOfRooms);
+    // printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
+
+
+    Room *foundRoom = NULL;
+
+    char roomsToFind[6][26] = {"Eingang", "Hoelleneingang", "Kueche", "Tempel", "Testraum", "Irgendeinraum"};
+   
+    for (int i = 0; i < 6; i++)
+    {
+        foundRoom = findRoom(roomsToFind[i], startRoom, -1);
+        if (foundRoom != NULL)
+            printRoom(foundRoom);
+        else
+            printf("Raum %s nicht gefunden!\n", roomsToFind[i]);
+        // printRoom(foundRoom);
+    }
 
     printf("\n");
     
     // only for Windows
-    // system("pause");
+    system("pause");
     
     return 0;
 }
@@ -370,27 +377,35 @@ Room* createRoom(int id, char* name, int lpImp, Monster *monster, Item *item)
 
 void printRoom(Room *room)
 {
-    printf("\n***************** Raum-Info ******************\n");
-    printf("Name: %s\n", room->name);
-    printf("Nachbarraeume:\n");
-    printf("\t\t\t  Nord: %s\n", room->nextroom[north]->name);
-    printf("\t\t\t  Ost : %s\n", room->nextroom[east]->name);
-    printf("\t\t\t  Sued: %s\n", room->nextroom[south]->name);
-    printf("\t\t\t  west: %s\n", room->nextroom[west]->name);
-    
-    if (room->monster == NULL)
+    if (room == NULL)
     {
-        printf("Monster: kein Monster\n");
+        printf("Error in printRoom: Argument *room is NULL\n");
     }
     else
     {
-        printf("Monster: %s\n", room->monster->name);
+        printf("\n***************** Raum-Info ******************\n");
+        printf("Name: %s\n", room->name);
+        printf("Nachbarraeume:\n");
+        printf("\t\t\t  Nord: %s\n", room->nextroom[north]->name);
+        printf("\t\t\t  Ost : %s\n", room->nextroom[east]->name);
+        printf("\t\t\t  Sued: %s\n", room->nextroom[south]->name);
+        printf("\t\t\t  west: %s\n", room->nextroom[west]->name);
+        
+        if (room->monster == NULL)
+        {
+            printf("Monster: kein Monster\n");
+        }
+        else
+        {
+            printf("Monster: %s\n", room->monster->name);
+        }
+        
+        printf("Schatz:  %s\n", room->loot->name);
+        printf("LP_Impact: %d\n", room->lpImpact);
+        printf("************************************************\n");
     }
     
-    printf("Schatz:  %s\n", room->loot->name);
-    printf("LP_Impact: %d\n", room->lpImpact);
-    printf("************************************************\n");
-
+    
 }
 
 void setRoomInDirection(Room *room_1, Room *room_2, int direction)
@@ -568,4 +583,27 @@ int countRooms(Room *room, int direction)
     }
 
     return (1 + sum);
+}
+
+Room* findRoom(char *roomName, Room *room, int direction)
+{
+    if (strcmp(room->name, roomName) == 0)
+    {
+        return room;
+    }
+    else
+    {
+        for (int i = north; i <= west; i++)
+        {
+            if (i != direction && getRoomInDirection(room, i) != NULL)
+            {
+                Room *returnRoom = findRoom(roomName, getRoomInDirection(room, i), (i + 2) % 4);
+                if (returnRoom != NULL && strcmp(returnRoom->name, roomName) == 0)
+                {
+                    return returnRoom;
+                }
+            }
+        }
+        return NULL;
+    }
 }
