@@ -104,7 +104,10 @@ int main(void)
     printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
 
     printf("\n");
-    system("pause");
+    
+    // only for Windows
+    // system("pause");
+    
     return 0;
 }
 
