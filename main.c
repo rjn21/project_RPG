@@ -107,6 +107,7 @@ int main(void)
             printRoom(foundRoom);
         else
             printf("Raum %s nicht gefunden!\n", roomsToFind[i]);
+        // printRoom(foundRoom);
     }
 
     printf("\n");
@@ -376,27 +377,35 @@ Room* createRoom(int id, char* name, int lpImp, Monster *monster, Item *item)
 
 void printRoom(Room *room)
 {
-    printf("\n***************** Raum-Info ******************\n");
-    printf("Name: %s\n", room->name);
-    printf("Nachbarraeume:\n");
-    printf("\t\t\t  Nord: %s\n", room->nextroom[north]->name);
-    printf("\t\t\t  Ost : %s\n", room->nextroom[east]->name);
-    printf("\t\t\t  Sued: %s\n", room->nextroom[south]->name);
-    printf("\t\t\t  west: %s\n", room->nextroom[west]->name);
-    
-    if (room->monster == NULL)
+    if (room == NULL)
     {
-        printf("Monster: kein Monster\n");
+        printf("Error in printRoom: Argument *room is NULL\n");
     }
     else
     {
-        printf("Monster: %s\n", room->monster->name);
+        printf("\n***************** Raum-Info ******************\n");
+        printf("Name: %s\n", room->name);
+        printf("Nachbarraeume:\n");
+        printf("\t\t\t  Nord: %s\n", room->nextroom[north]->name);
+        printf("\t\t\t  Ost : %s\n", room->nextroom[east]->name);
+        printf("\t\t\t  Sued: %s\n", room->nextroom[south]->name);
+        printf("\t\t\t  west: %s\n", room->nextroom[west]->name);
+        
+        if (room->monster == NULL)
+        {
+            printf("Monster: kein Monster\n");
+        }
+        else
+        {
+            printf("Monster: %s\n", room->monster->name);
+        }
+        
+        printf("Schatz:  %s\n", room->loot->name);
+        printf("LP_Impact: %d\n", room->lpImpact);
+        printf("************************************************\n");
     }
     
-    printf("Schatz:  %s\n", room->loot->name);
-    printf("LP_Impact: %d\n", room->lpImpact);
-    printf("************************************************\n");
-
+    
 }
 
 void setRoomInDirection(Room *room_1, Room *room_2, int direction)
@@ -580,7 +589,6 @@ Room* findRoom(char *roomName, Room *room, int direction)
 {
     if (strcmp(room->name, roomName) == 0)
     {
-        // printf("\n\nRaum %s gefunden!", roomName);
         return room;
     }
     else
