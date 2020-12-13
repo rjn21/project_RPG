@@ -1,6 +1,9 @@
 # project_RPG
 
-# TODO
+## Currently working on:
+* function so search a speciic room
+
+## TODO
 * Add a menue for the different functions (e. g. counting rooms, Reading in
 	different files (rooms, treasures))
 * implement a function for searching a specific room or item

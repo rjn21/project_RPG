@@ -78,35 +78,41 @@ int countRoomsRek(Room*, int*);
 int countRoomsWithArray(Room*, int*);
 int countRooms(Room*, int);
 
-
-
-
-
-
-
+Room* findRoom(char*, Room*, int);
 
 int main(void)
 {
     srand((unsigned int) time(NULL));
-    
     int nrOfItems = readTreasureFile("items.txt");
-
     Room *startRoom = (Room*) malloc(sizeof(Room));
-
     int nrOfRooms = createMap("rooms.txt", &nrOfItems, &startRoom);
     
-    printDungeon(startRoom, -1, NULL);
+    // printDungeon(startRoom, -1, NULL);
 
-    int nrOfRoomsRek = countRooms(startRoom, -1);
-    printf("countRooms: %d\n", nrOfRoomsRek);
+    // int nrOfRoomsRek = countRooms(startRoom, -1);
+    // printf("countRooms: %d\n", nrOfRoomsRek);
 
-    nrOfRoomsRek = countRoomsWithArray(startRoom, &nrOfRooms);
-    printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
+    // nrOfRoomsRek = countRoomsWithArray(startRoom, &nrOfRooms);
+    // printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
+
+
+    Room *foundRoom = NULL;
+
+    char roomsToFind[6][26] = {"Eingang", "Hoelleneingang", "Kueche", "Tempel", "Testraum", "Irgendeinraum"};
+   
+    for (int i = 0; i < 6; i++)
+    {
+        foundRoom = findRoom(roomsToFind[i], startRoom, -1);
+        if (foundRoom != NULL)
+            printRoom(foundRoom);
+        else
+            printf("Raum %s nicht gefunden!\n", roomsToFind[i]);
+    }
 
     printf("\n");
     
     // only for Windows
-    // system("pause");
+    system("pause");
     
     return 0;
 }
@@ -568,4 +574,28 @@ int countRooms(Room *room, int direction)
     }
 
     return (1 + sum);
+}
+
+Room* findRoom(char *roomName, Room *room, int direction)
+{
+    if (strcmp(room->name, roomName) == 0)
+    {
+        // printf("\n\nRaum %s gefunden!", roomName);
+        return room;
+    }
+    else
+    {
+        for (int i = north; i <= west; i++)
+        {
+            if (i != direction && getRoomInDirection(room, i) != NULL)
+            {
+                Room *returnRoom = findRoom(roomName, getRoomInDirection(room, i), (i + 2) % 4);
+                if (returnRoom != NULL && strcmp(returnRoom->name, roomName) == 0)
+                {
+                    return returnRoom;
+                }
+            }
+        }
+        return NULL;
+    }
 }
