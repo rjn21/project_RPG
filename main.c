@@ -104,6 +104,7 @@ int main(void)
     printf("nrOfRoomsWithArray: %d\n", nrOfRoomsRek);
 
     printf("\n");
+    system("pause");
     return 0;
 }
 
@@ -163,7 +164,7 @@ int readTreasureFile(char *filename)
         char buffer[256];
         fscanf(fin, "%d\n", &count);
 
-        treasures = (Item*) malloc(count * sizeof(Item*));
+        treasures = (Item**) malloc(count * sizeof(Item*));
 
         for (int i = 0; i < count; i++)
         {
@@ -434,7 +435,7 @@ int createMap(char* filename, int *n, Room **startRoom)
         fscanf(fin, "%d\n", &count);
 
         // Speicher für "count" Raeume allokieren
-        rooms = (Room*) malloc(count * sizeof(Room*));
+        rooms = (Room**) malloc(count * sizeof(Room*));
 
         char buffer[256];
         char name[256];
@@ -496,7 +497,6 @@ int createMap(char* filename, int *n, Room **startRoom)
 void printDungeon(Room *room, int direction, int *rekDepth)
 {
     printRoom(room);
-    // printf("ID: %d\n", room->id);
 
     for (int i = north; i <= west; i++)
     {
